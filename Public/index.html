@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quiz Game</title>
+    <link rel="stylesheet" href="index.css" />
+    <script>
+      let lives = 3;
+      let correctAnswer;
+      let timerDuration;
+      let timerInterval;
+      let level = 1;
+      let questionCount = 0;
+      let score = 0;
+      let musicPlaying = true;
+      const audio = new Audio("music/quiz.mp3");
+
+      async function loadQuestion() {
+        if (questionCount >= 5) {
+          levelUp(); // next level after 5questions
+          return;
+        }
+        const res = await fetch("/quiz");
+        const data = await res.json();
+        document.getElementById("question").src = data.question;
+        correctAnswer = data.solution;
+        lives = 3;
+        timerDuration = 60 - (level - 1) * 5; // Reduce time
+        document.getElementById("lives").textContent = lives;
+        document.getElementById("level").textContent = level;
+        resetAndStartTimer();
+      }
+
+      function levelUp() {
+        document.getElementById(
+          "level-message"
+        ).textContent = `Level ${level} complete! Moving to level ${
+          level + 1
+        }.`;
+        document.getElementById("level-modal").style.display = "block";
+        clearInterval(timerInterval);
+      }
+
+      function proceedToNextLevel() {
+        document.getElementById("level-modal").style.display = "none";
+        level++;
+        questionCount = 0;
+        loadQuestion();
+      }
+
+      function resetAndStartTimer() {
+        clearInterval(timerInterval);
+        document.getElementById("time").textContent = timerDuration;
+        startTimer(timerDuration);
+      }
+
+      function startTimer(duration) {
+        let timeLeft = duration;
+        timerInterval = setInterval(() => {
+          document.getElementById("time").textContent = timeLeft;
+          if (timeLeft-- <= 0) {
+            clearInterval(timerInterval);
+            handleIncorrectAnswer();
+          }
+        }, 1000);
+      }
+
+      async function submitAnswer() {
+        const answer = document.getElementById("answer").value;
+        if (answer == correctAnswer) {
+          score += lives;
+          questionCount++;
+          document.getElementById("answer").value = "";
+          await loadQuestion();
+        } else {
+          document.getElementById("answer").value = "";
+          handleIncorrectAnswer();
+        }
+      }
+
+      function handleIncorrectAnswer() {
+        lives--;
+        document.getElementById("lives").textContent = lives;
+        if (lives <= 0) {
+          document.getElementById("game-over-modal").style.display = "block";
+          clearInterval(timerInterval);
+        } else {
+          timerDuration = Math.max(5, timerDuration - 5);
+          resetAndStartTimer();
+        }
+      }
+
+      async function submitScore() {
+        await fetch("/submit-score", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ level, score }),
+        });
+        showScoreboard();
+      }
+
+      function retryGame() {
+        document.getElementById("game-over-modal").style.display = "none";
+        lives = 3;
+        level = 1;
+        questionCount = 0;
+        score = 0;
+        loadQuestion();
+      }
+
+      function exitGame() {
+        window.location.href = "/about";
+      }
+
+      function showScoreboard() {
+        submitScore();
+        window.location.href = "/scoreboard";
+      }
+
+      function toggleMusic() {
+        if (musicPlaying) {
+          audio.pause();
+          document.getElementById("music-toggle-btn").textContent = "Music On";
+        } else {
+          audio.play();
+          document.getElementById("music-toggle-btn").textContent = "Music Off";
+        }
+        musicPlaying = !musicPlaying;
+      }
+
+      window.onload = () => {
+        loadQuestion();
+        audio.loop = true;
+        audio.play();
+        document.getElementById("music-toggle-btn").textContent = "Music Off";
+      };
+    </script>
+  </head>
+  <body>
+    <div class="header">
+      <button class="logout-button" onclick="exitGame()">Exit</button>
+      <button id="music-toggle-btn" class="button" onclick="toggleMusic()">
+        Music Off
+      </button>
+    </div>
+
+    <div class="container">
+      <div class="game-content">
+        <div class="quiz-section">
+          <div class="quiz-image">
+            <img id="question" alt="Quiz question" />
+          </div>
+
+          <div class="input-group">
+            <input
+              type="text"
+              id="answer"
+              placeholder="Enter Answer"
+              class="answer-input"
+            />
+            <button class="button" onclick="submitAnswer()">Submit</button>
+          </div>
+        </div>
+
+        <div class="status-panel">
+          <div class="status-box">Level <span id="level">1</span></div>
+          <div class="status-box">Lives Left <span id="lives">3</span></div>
+          <div class="status-box timer">
+            <div>Time Left</div>
+            <div id="time">60s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="level-modal" class="modal">
+      <div class="modal-content">
+        <h2 id="level-message"></h2>
+        <button class="button" onclick="proceedToNextLevel()">
+          Next Level
+        </button>
+      </div>
+    </div>
+
+    <div id="game-over-modal" class="modal">
+      <div class="modal-content">
+        <h2>Game Over!</h2>
+        <button class="button" onclick="retryGame()">Retry</button>
+        <button class="button" onclick="exitGame()">Exit</button>
+        <button class="button" onclick="showScoreboard()">Scoreboard</button>
+      </div>
+    </div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="game-character"></div>
+  </body>
+</html>
