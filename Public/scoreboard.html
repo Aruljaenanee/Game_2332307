@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Scoreboard</title>
+    <link rel="stylesheet" href="scoreboard.css" />
+    <script>
+      async function loadScoreboard() {
+        const response = await fetch("/scoreboard");
+        const data = await response.json();
+
+        let scoreboardHtml = '<div class="scoreboard-title">Score Board</div>';
+        scoreboardHtml += `<table><tr><th>Name</th><th>Level</th><th>High Score</th></tr>`;
+
+        data.forEach((player) => {
+          const highlightClass = player.isCurrentUser
+            ? ' class="highlight"'
+            : "";
+          scoreboardHtml += `<tr${highlightClass}><td>${player.username}</td><td>${player.level}</td><td>${player.high_score}</td></tr>`;
+        });
+
+        scoreboardHtml += "</table>";
+        document.getElementById("scoreboard").innerHTML = scoreboardHtml;
+      }
+
+      function retryGame() {
+        window.location.href = "/game";
+      }
+
+      function exitGame() {
+        window.location.href = "/about";
+      }
+
+      window.onload = function () {
+        loadScoreboard();
+        const audio = new Audio("music/score.mp3");
+        audio.loop = true;
+        audio.play();
+      };
+    </script>
+  </head>
+  <body>
+    <h1>Game Over</h1>
+    <div id="scoreboard" class="scoreboard-container"></div>
+    <button class="button" onclick="retryGame()">Re Try</button>
+    <button class="button" onclick="exitGame()">Exit</button>
+  </body>
+</html>
