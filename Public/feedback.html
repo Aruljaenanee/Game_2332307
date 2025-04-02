@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kid-Friendly Feedback Page</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Nunito", sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        overflow-x: hidden;
+      }
+
+      .container {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+      }
+
+      .feedback-card {
+        background-color: white;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transform-style: preserve-3d;
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .feedback-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-header {
+        background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
+        padding: 25px 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header-title {
+        color: white;
+        font-size: 28px;
+        font-weight: 800;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+      }
+
+      .card-header:before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          rgba(255, 255, 255, 0.2) 8%,
+          transparent 8%
+        );
+        background-position: 0 0;
+        background-size: 25px 25px;
+        opacity: 0;
+        transform: rotate(30deg);
+        transition: opacity 0.5s;
+        z-index: 1;
+      }
+
+      .feedback-card:hover .card-header:before {
+        opacity: 1;
+        animation: bubbles 3s linear infinite;
+      }
+
+      @keyframes bubbles {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 50px 50px;
+        }
+      }
+
+      .card-content {
+        padding: 30px;
+        position: relative;
+      }
+
+      .rating-title {
+        text-align: center;
+        font-size: 18px;
+        color: #555;
+        margin-bottom: 20px;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      .rating-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+
+      .stars {
+        display: flex;
+        gap: 15px;
+      }
+
+      .star {
+        position: relative;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        transform-origin: center;
+      }
+
+      .star:hover {
+        transform: scale(1.2) rotate(5deg);
+      }
+
+      .star svg {
+        width: 100%;
+        height: 100%;
+        fill: #e0e0e0;
+        transition: fill 0.3s ease, filter 0.3s ease;
+      }
+
+      .star.active svg {
+        fill: #ffca28;
+        filter: drop-shadow(0 0 3px rgba(255, 202, 40, 0.5));
+      }
+
+      .star.pop {
+        animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      @keyframes pop {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.4) rotate(10deg);
+        }
+        100% {
+          transform: scale(1) rotate(0);
+        }
+      }
+
+      .feedback-text {
+        margin-bottom: 30px;
+        animation: slideUp 0.5s ease;
+      }
+
+      textarea {
+        width: 100%;
+        height: 120px;
+        padding: 15px;
+        border-radius: 16px;
+        border: 2px solid #e0e0e0;
+        font-size: 16px;
+        resize: none;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #6a11cb;
+        box-shadow: 0 5px 15px rgba(106, 17, 203, 0.15);
+      }
+
+      .submit-btn {
+        display: block;
+        width: 180px;
+        margin: 0 auto;
+        background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        border: none;
+        padding: 15px 25px;
+        border-radius: 30px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 15px rgba(106, 17, 203, 0.2);
+        animation: bounceIn 0.6s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(106, 17, 203, 0.3);
+      }
+
+      .submit-btn:active {
+        transform: translateY(1px);
+      }
+
+      .submit-btn:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+      }
+
+      @keyframes ripple {
+        0% {
+          transform: scale(0, 0);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(100, 100);
+          opacity: 0;
+        }
+      }
+
+      .submit-btn:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+      }
+
+      .message {
+        height: 20px;
+        text-align: center;
+        margin-top: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      .message.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .success {
+        color: #4caf50;
+      }
+
+      .error {
+        color: #f44336;
+      }
+
+      /* Floating elements */
+      .floating-element {
+        position: absolute;
+        pointer-events: none;
+        animation-timing-function: ease-in-out;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        z-index: -1;
+      }
+
+      .circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        opacity: 0.6;
+        background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      }
+
+      .circle:nth-child(2) {
+        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      }
+
+      .circle:nth-child(3) {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      }
+
+      .square {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        border-radius: 10px;
+        opacity: 0.6;
+      }
+
+      .triangle {
+        width: 0;
+        height: 0;
+        border-left: 50px solid transparent;
+        border-right: 50px solid transparent;
+        border-bottom: 80px solid rgba(166, 193, 238, 0.6);
+        opacity: 0.7;
+      }
+
+      .float1 {
+        top: 10%;
+        left: -50px;
+        animation: float 7s;
+      }
+
+      .float2 {
+        top: 20%;
+        right: -40px;
+        animation: float 9s;
+      }
+
+      .float3 {
+        bottom: 10%;
+        left: -30px;
+        animation: float 8s;
+      }
+
+      .float4 {
+        bottom: 20%;
+        right: -50px;
+        animation: float 10s;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(5deg);
+        }
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes bounceIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.3) translateY(40px);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05) translateY(-10px);
+        }
+        70% {
+          transform: scale(0.9) translateY(5px);
+        }
+        100% {
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      /* Confetti effect */
+      .confetti-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 100;
+        overflow: hidden;
+        display: none;
+      }
+
+      .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #f44336;
+        opacity: 0.7;
+      }
+
+      @keyframes confettiFall {
+        0% {
+          opacity: 1;
+          transform: translateY(-100px) rotate(0deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(500px) rotate(180deg);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .card-header {
+          padding: 20px 15px;
+        }
+
+        .header-title {
+          font-size: 24px;
+        }
+
+        .card-content {
+          padding: 20px;
+        }
+
+        .star {
+          width: 40px;
+          height: 40px;
+        }
+
+        .floating-element {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Floating elements -->
+    <div class="floating-element circle float1"></div>
+    <div class="floating-element circle float2"></div>
+    <div class="floating-element square float3"></div>
+    <div class="floating-element triangle float4"></div>
+
+    <div class="container">
+      <div class="feedback-card">
+        <div class="card-header">
+          <h1 class="header-title">We'd love your feedback!</h1>
+        </div>
+        <div class="card-content">
+          <div class="rating-title">How was your experience?</div>
+          <div class="rating-container">
+            <div class="stars">
+              <div class="star" data-rating="1">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                  />
+                </svg>
+              </div>
+              <div class="star" data-rating="2">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                  />
+                </svg>
+              </div>
+              <div class="star" data-rating="3">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                  />
+                </svg>
+              </div>
+              <div class="star" data-rating="4">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                  />
+                </svg>
+              </div>
+              <div class="star" data-rating="5">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="feedback-text">
+            <textarea
+              placeholder="Tell us what you liked or how we can improve..."
+            ></textarea>
+          </div>
+          <button class="submit-btn">Send Feedback</button>
+          <div class="message"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confetti container for celebration -->
+    <div class="confetti-container"></div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const stars = document.querySelectorAll(".star");
+        const submitBtn = document.querySelector(".submit-btn");
+        const messageDiv = document.querySelector(".message");
+        const confettiContainer = document.querySelector(".confetti-container");
+        let currentRating = 0;
+
+        // Star rating functionality with animation
+        stars.forEach((star) => {
+          star.addEventListener("click", function () {
+            const rating = parseInt(this.getAttribute("data-rating"));
+
+            // Add "pop" animation class
+            this.classList.add("pop");
+
+            // Remove the class after animation completes
+            setTimeout(() => {
+              this.classList.remove("pop");
+            }, 300);
+
+            setRating(rating);
+          });
+
+          star.addEventListener("mouseover", function () {
+            const rating = parseInt(this.getAttribute("data-rating"));
+            highlightStars(rating);
+          });
+
+          star.addEventListener("mouseout", function () {
+            highlightStars(currentRating);
+          });
+        });
+
+        // Submit button with ripple animation and confetti
+        submitBtn.addEventListener("click", function (e) {
+          const feedback = document.querySelector("textarea").value;
+
+          if (currentRating === 0) {
+            showMessage("Please select a star rating!", "error");
+            shakeButton();
+            return;
+          }
+
+          const feedbackData = {
+            rating: currentRating,
+            feedback: feedback,
+          };
+
+          fetch("/submit-feedback", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(feedbackData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Success:", data);
+              showMessage("Thank you for your feedback!", "success");
+
+              if (currentRating >= 4) {
+                createConfetti();
+              }
+
+              setTimeout(() => {
+                resetForm();
+              }, 3000);
+
+              setTimeout(() => {
+                window.location.href = "/allfeedbacks";
+              }, 3500);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              showMessage("Something went wrong. Please try again!", "error");
+            });
+        });
+
+        function setRating(rating) {
+          currentRating = rating;
+          highlightStars(rating);
+        }
+
+        function highlightStars(rating) {
+          stars.forEach((star) => {
+            const starRating = parseInt(star.getAttribute("data-rating"));
+            if (starRating <= rating) {
+              star.classList.add("active");
+            } else {
+              star.classList.remove("active");
+            }
+          });
+        }
+
+        function showMessage(text, type) {
+          messageDiv.textContent = text;
+          messageDiv.className = "message " + type + " show";
+        }
+
+        function resetForm() {
+          setRating(0);
+          document.querySelector("textarea").value = "";
+          messageDiv.className = "message";
+          confettiContainer.style.display = "none";
+          confettiContainer.innerHTML = "";
+        }
+
+        function shakeButton() {
+          submitBtn.classList.add("shake");
+          setTimeout(() => {
+            submitBtn.classList.remove("shake");
+          }, 500);
+        }
+
+        function createConfetti() {
+          confettiContainer.style.display = "block";
+          confettiContainer.innerHTML = "";
+
+          const colors = [
+            "#f44336",
+            "#2196f3",
+            "#ffeb3b",
+            "#4caf50",
+            "#9c27b0",
+            "#ff9800",
+          ];
+
+          // Create confetti pieces
+          for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement("div");
+            confetti.classList.add("confetti");
+
+            // Random position, color, shape and rotation
+            const left = Math.random() * 100;
+            const backgroundColor =
+              colors[Math.floor(Math.random() * colors.length)];
+            const shape = Math.random() > 0.5 ? "50%" : "0%";
+            const width = Math.random() * 10 + 5;
+            const height = Math.random() * 10 + 5;
+            const duration = Math.random() * 3 + 2;
+            const delay = Math.random() * 0.5;
+
+            confetti.style.left = left + "vw";
+            confetti.style.width = width + "px";
+            confetti.style.height = height + "px";
+            confetti.style.backgroundColor = backgroundColor;
+            confetti.style.borderRadius = shape;
+            confetti.style.animation = `confettiFall ${duration}s ease forwards ${delay}s`;
+
+            confettiContainer.appendChild(confetti);
+          }
+        }
+
+        // Animate floating elements
+        function animateFloatingElements() {
+          const elements = document.querySelectorAll(".floating-element");
+
+          elements.forEach((element, index) => {
+            element.style.animationDelay = index * 0.5 + "s";
+          });
+        }
+
+        animateFloatingElements();
+      });
+    </script>
+  </body>
+</html>

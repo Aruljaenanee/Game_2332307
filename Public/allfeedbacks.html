@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Feedback</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        width: 80%;
+        max-width: 1000px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      .feedback-card {
+        background-color: #f9f9f9;
+        margin: 15px 0;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .feedback-card .rating {
+        font-size: 18px;
+        color: #ffca28;
+        margin-bottom: 10px;
+      }
+      .feedback-card .date {
+        font-size: 14px;
+        color: #777;
+      }
+      .feedback-card .message {
+        font-size: 16px;
+        color: #333;
+        margin-top: 10px;
+      }
+      .message-error {
+        color: red;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Your Feedback History</h1>
+      <div id="feedback-list"></div>
+      <div id="error-message" class="message-error"></div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Fetch feedback data from the backend
+        fetch("/get-feedback", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Include cookies (for JWT token)
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to fetch feedback data.");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            const feedbackList = document.getElementById("feedback-list");
+            const errorMessage = document.getElementById("error-message");
+
+            if (data.feedback.length === 0) {
+              errorMessage.textContent = "No feedback found for your account.";
+              return;
+            }
+
+            data.feedback.forEach((feedback) => {
+              const feedbackCard = document.createElement("div");
+              feedbackCard.classList.add("feedback-card");
+
+              const rating = document.createElement("div");
+              rating.classList.add("rating");
+              rating.textContent = `Rating: ${feedback.rating} stars`;
+              const message = document.createElement("div");
+              message.classList.add("message");
+              message.textContent = feedback.feedback;
+
+              feedbackCard.appendChild(rating);
+              feedbackCard.appendChild(message);
+              feedbackList.appendChild(feedbackCard);
+            });
+          })
+          .catch((error) => {
+            document.getElementById("error-message").textContent =
+              "Error fetching feedback. Please try again later.";
+          });
+      });
+    </script>
+  </body>
+</html>
