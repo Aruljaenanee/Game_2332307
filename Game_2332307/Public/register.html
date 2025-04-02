@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Register</title>
+    <link rel="stylesheet" href="register.css" />
+  </head>
+  <body>
+    <div class="register-container">
+      <h2>Sign Up</h2>
+      <form id="registerForm">
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Username"
+          required
+        />
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          required
+        />
+        <button type="submit">Register</button>
+      </form>
+      <a href="/">Don't have an account? Click here to Sign up</a>
+    </div>
+
+    <script>
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          // get frm form
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+          //password match
+          if (password !== confirmPassword) {
+            alert("Passwords do not match! Please try again.");
+            return;
+          }
+
+          // Send data to server
+          fetch("/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.message === "User registered successfully!") {
+                alert("Registration successful! Redirecting to login page...");
+                window.location.href = "/";
+              } else {
+                alert("Registration failed! Please try again.");
+              }
+            })
+            .catch((error) => {
+              console.error("Error during registration:", error);
+              alert("An error occurred. Please try again.");
+            });
+        });
+    </script>
+  </body>
+</html>
