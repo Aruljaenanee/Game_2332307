@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Scoreboard</title>
+    <link rel="stylesheet" href="leaderboard.css" />
+    <script>
+      async function loadScoreboard() {
+        const response = await fetch("/scoreboard-list");
+        const data = await response.json();
+
+        let scoreboardHtml = '<div class="scoreboard-title">Leader Board</div>';
+        scoreboardHtml += `<table><tr><th>Name</th><th>Level</th><th>High Score</th></tr>`;
+
+        data.forEach((player) => {
+          const highlightClass = player.isCurrentUser
+            ? ' class="highlight"'
+            : "";
+          scoreboardHtml += `<tr${highlightClass}><td>${player.username}</td><td>${player.level}</td><td>${player.high_score}</td></tr>`;
+        });
+
+        scoreboardHtml += "</table>";
+        document.getElementById("scoreboard").innerHTML = scoreboardHtml;
+      }
+
+      function exitGame() {
+        window.location.href = "/about";
+      }
+
+      window.onload = function () {
+        loadScoreboard();
+        const audio = new Audio("music/score.mp3");
+        audio.loop = true;
+        audio.play();
+      };
+    </script>
+  </head>
+  <body>
+    <div id="scoreboard" class="scoreboard-container"></div>
+    <button class="button" onclick="exitGame()">Back</button>
+  </body>
+</html>
